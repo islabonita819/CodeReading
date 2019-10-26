@@ -1,0 +1,161 @@
+
+<HTML>
+	<HEAD>
+		<!-- 
+		meta: https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/meta
+		http-equiv这个枚举属性定义了能改变服务器和用户引擎行为的编译。这个编译值使用content 来定义 
+		-->
+		<meta http-equiv="Content-Language" content="zh-cn">
+		<meta http-equiv="Content-Type" content="text/html; charset=gb2312">	
+		<TITLE>ZhengChuang SoftPhone</TITLE>
+	</HEAD>
+	
+	<BODY>
+		<SCRIPT LANGUAGE="JavaScript">
+		  //连接
+		  function zcsmLogin()   
+		  {
+		  	//服务器ip
+			ZCSMClient.SMServerIP = document.all.item("serverip").value;
+			//服务器端口号
+			ZCSMClient.SMServerPort = document.all.item("serverport").value;
+			//?
+			ZCSMClient.AudioType = 2;
+			//本地回放设置1；接收语音数据设置3
+			ZCSMClient.VendorType = 1;
+
+			//启动调用ConnectServer后服务端返回各服务的OnServerInformation事件
+			if (!ZCSMClient.ConnectServer())
+			{
+				alert("ConnectServer failed " +　form1.serverip.value + " " + form1.serverport.value);
+				return;
+			}
+			
+			//获取服务列表信息GetServerInfo，有一个服务发一个OnServerInformation事件
+			ZCSMClient.GetServerInfo();
+
+		  }
+		  //停止连接
+		  function zcsmLogout()
+		  {
+			ZCSMClient.DisConnectServer();
+		  }  
+		  //监听分机
+		  function startListen()
+		  {
+		  	ZCSMClient.StartDeviceListen(document.all.item("commname").value, document.all.item("station").value);
+		  }    
+		  //停止监听分机
+		  function stopListen()
+		  {
+			ZCSMClient.StopDeviceListen(form1.commname.value, form1.station.value);
+		  }   
+		  //在textarea里显示s
+		  var log = function (s) 
+		  {  
+                        document.getElementById("contentId").value += (s + "\n");
+                  }
+		</SCRIPT>
+		<script 
+			language=javascript 
+			FOR=ZCSMClient 
+			EVENT=OnServerChnCallOffered(strCommSvrToCC,nChnIndex,strANI,strDNIS,strEXT)> 
+        	{
+				log("电话振铃,主叫号码:"+strANI);
+        	}
+        </script>
+		<!-- 
+			FOR/EVENT 是IE特有的属性
+			link: https://stackoverflow.com/questions/1557446/what-are-the-for-and-event-attributes-of-the-script-tag-javascript-html
+		 -->
+		<script language=javascript FOR=ZCSMClient EVENT=OnServerInformation(strCommSvrToCC,strServerName,strHostName,strHostIp,strServerStartDT,nChnNum,nServerType,nListenPort,nMonitoredNum)> 
+            {
+            	//需要监控某服务则调用StartMonitorServer
+				ZCSMClient.StartMonitorServer(strCommSvrToCC);
+				document.getElementById("commname").value = strCommSvrToCC;
+				log("通讯名称:"+strCommSvrToCC);
+           	 }            
+		</script>
+		<script language=javascript FOR=ZCSMClient EVENT=OnServerAudioVoiceData(strCommSvrToCC,nListenChn,strEXT,nAudioFormat,nDataLen,strAudioVoiceData)> 
+            	{
+            		//alert(strCommSvrToCC);
+			//log("通讯名称:"+strCommSvrToCC+"；收到"+strEXT+"语音数据长度:"+nDataLen);
+           	 }            
+		</script>		
+             
+
+		<!-- 
+			<object> 元素（或者称作 HTML 嵌入对象元素）表示引入一个外部资源，这个资源可能是一张图片，一个嵌入的浏览上下文，亦或是一个插件所使用的资源。
+			link: https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/object
+		 -->
+		<OBJECT 
+		CLASSID="CLSID:CC39623F-69BB-44FE-9E82-E487A5DF4822"
+		name="ZCSMClient" 
+		WIDTH=1 HEIGHT=1 
+		id="ZCSMClient" 
+		codebase="SMClient.cab#version=1,0,0,2">
+		</OBJECT>
+		<!-- codebase 解析根路径 -->
+
+		<!-- 
+			<form> 元素表示了文档中的一个区域，此区域包含有交互控制元件，用来向 Web 服务器提交信息。
+			link: https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/form
+
+		 -->
+		<form name="form1" id="form1" method="post" action="--WEBBOT-SELF--">
+			<table width="501" height="90" border="0">
+				<tr>
+					<td>
+						服务器IP：
+					</td>
+					<td>
+						<label>
+							<input type="text" name="serverip" id="serverip" value="127.0.0.1">
+						</label>
+					</td>
+					<td>
+						端口：
+					</td>
+					<td>
+						<label>
+							<input type="text" name="serverport" id="serverport" value="6005">
+						</label>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>
+							<input type="button" name="login" id="login" value="连接"
+								onClick="zcsmLogin()">
+						</label>
+					</td>
+					<td>&nbsp;
+						
+					</td>
+					<td>
+						<label>
+							<input type="button" name="logout" id="logout" value="停止"
+								onClick="zcsmLogout()">
+						</label>
+					</td>
+					<td>&nbsp;
+						
+					</td>
+				</tr>
+			</table>
+		<input type="text" name="commname" id="commname" placeholder="通讯名" />
+		<p>
+			<input type="text" name="station" id="station" size="20" value="Microphone"/>  
+			<input type="button" name="监听分机" value="监听分机" onclick="javascript:startListen();">
+			<input type="button" name="停止监听分机" value="停止监听分机" onclick="javascript:stopListen();">
+		</p>		
+		<p>
+		
+		</p>
+			<div id="valueLabel"><textarea rows="20" cols="110" id="contentId"></textarea>
+		</form>
+        		
+	    </div>		
+	</BODY>
+
+</HTML>

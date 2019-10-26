@@ -1,0 +1,34 @@
+录音接口Demo使用操作说明
+1、	将“NetVoice.zip”解压缩到D盘目录下，压缩包内容位于“D:\NetVoice”文件夹下。
+2、	如果通过本机抓取音频数据，获取音频客户端也在本机，则可使用默认配置；如果抓取音频和客户端不在同一台机器上，需修改配置文件：
+	1)	修改D:\NetVoice\ControlCenter\ConfCC.ini文件中“127.0.0.1”修改为实际抓取麦克音频数据的IP地址。
+	2)	修改D:\NetVoice\VoiceLogger\ConfVL.ini文件中“127.0.0.1” 修改为实际抓取麦克音频数据的IP地址。
+	3)	客户端服务器IP修改为实际抓取麦克音频数据的IP地址。
+3、	启动。分为服务器启动和客户端启动。
+服务端：
+	1)	双击D:\NetVoice\ControlCenter\startup.bat启动控制中心。
+	2)	运行D:\NetVoice\VoiceLogger\LicenseManager获取本机特征码，发给供应商以便获取测试许可；或取到许可后覆盖D:\NetVoice\VoiceLogger\下的license.dat原有文件。
+	3)	双击D:\NetVoice\VoiceLogger\startup.bat启动抓取麦克风音频数据服务。
+客户端：
+	1)	双击D:\NetVoice\录音接口WebDemo\SmartMonitorDemo.html启动。（用IE浏览器打开或360浏览器的兼容模式打开）
+
+
+录音接口说明
+OCX调用步骤
+1、	配置属性。设置控制中心的IP地址和端口.
+	audiotype一般设置成8k16bit，
+	VendorType一般设置成audiowav，需要流数据设置成audioout
+2、	连接服务。启动调用ConnectServer后服务端返回各服务的OnServerInformation事件
+3、	监控服务。需要监控某服务则调用StartMonitorServer
+4、	通道状态变化。
+	通道开始录音或收听录音有OnServerChnDetailInfo事件，状态对应为smSvrChn_RECORD和smSvrChn_PLAY；
+	通道录音或回放结束有OnServerChnStatus事件，状态smSvrChn_IDLE或smSvrChn_OFFLINE
+5、	监听通道。监听某通道则调用StartChnListen和StopChnListen
+	监听某分机则调用StartDeviceListen和StopDeviceListen
+	通道是固定不变的，但分机根据不同的录音方式不同变化
+	会议录音和中继并线录音：通道不变，但分机变化
+	压控、声控、模拟并线、数字并线、镜像录音：通道不变，分机不变
+6、	停止监控某服务StopMonitorServer
+7、	断开服务DisConnectServer
+8、	获取服务列表信息GetServerInfo，有一个服务发一个OnServerInformation事件
+9、	其他参考文档《结合SMAPIX控件接口说明.pdf》
