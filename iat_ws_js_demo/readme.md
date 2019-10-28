@@ -1,3 +1,5 @@
+讯飞语音听写流式API
+
 ## 准备
 1.在demo中填写APPID、APISecret、APIKey，可到控制台-我的应用-语音听写（流式版）页面获取
 2.安装nodejs
